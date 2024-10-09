@@ -1,5 +1,5 @@
-﻿using BulkyWeb.Data;
-using BulkyWeb.Models;
+﻿using Bulky.DataAccess.Data;
+using Bulky.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulkyWeb.Controllers
@@ -27,7 +27,7 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
-            if(obj.Name == obj.DisplayOrder.ToString())
+            if (obj.Name == obj.DisplayOrder.ToString())
             {
                 ModelState.AddModelError("Name", "Category Name and Display Order cannot be the same");
             }
@@ -43,7 +43,8 @@ namespace BulkyWeb.Controllers
             return View();
         }
 
-        public IActionResult Edit(int? id) {
+        public IActionResult Edit(int? id)
+        {
             if (id == null || id == 0)
             {
                 return NotFound();
@@ -63,7 +64,7 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Edit(Category obj)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 _db.Categories.Update(obj);
                 _db.SaveChanges();
