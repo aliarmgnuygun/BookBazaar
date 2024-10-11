@@ -1,6 +1,7 @@
 ﻿using BookBazaar.DataAccess.Repository.IRepository;
 using BookBazaar.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookBazaar.Areas.Admin.Controllers
 {
@@ -21,6 +22,14 @@ namespace BookBazaar.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll(). // This is projection implementation in EFCore 
+               Select(u => new SelectListItem
+               {
+                   Text = u.Name,
+                   Value = u.Id.ToString()
+               });
+
+            ViewBag.CategoryList = CategoryList;
             return View();
         }
 
