@@ -3,7 +3,6 @@ using BookBazaar.Models;
 using BookBazaar.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.FileProviders;
 
 namespace BookBazaar.Areas.Admin.Controllers
 {
@@ -11,10 +10,12 @@ namespace BookBazaar.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         public readonly IUnitOfWork _unitOfWork;
+        public readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -30,13 +31,13 @@ namespace BookBazaar.Areas.Admin.Controllers
                 // This is projection implementation in EFCore 
                 CategoryList = _unitOfWork.Category.GetAll().
                 Select(u => new SelectListItem
-               {
-                   Text = u.Name,
-                   Value = u.Id.ToString()
-               })
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                })
             };
 
-            if(id == null || id == 0)
+            if (id == null || id == 0)
             {
                 //create
                 return View(productVM);
@@ -59,9 +60,43 @@ namespace BookBazaar.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                _unitOfWork.Product.Add(productVM.Product);
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath + @"\images\product", fileName);
+
+                    if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    {
+                        //delete old image
+                        var oldFilePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productVM.Product.ImageUrl = @"\images\product\" + fileName;
+                }
+
+                if (productVM.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(productVM.Product);
+                    TempData["Success"] = "Book created successfully";
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(productVM.Product);
+                    TempData["Success"] = "Book updated successfully";
+                }
+
                 _unitOfWork.Save();
-                TempData["Success"] = "Book created successfully";
                 return RedirectToAction("Index");
             }
             else
@@ -95,9 +130,10 @@ namespace BookBazaar.Areas.Admin.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        public IActionResult Delete(int id) {
+        public IActionResult Delete(int id)
+        {
             Product product = _unitOfWork.Product.Get(p => p.Id == id);
-            
+
             if (product == null)
             {
                 TempData["Error"] = "Book not found";
