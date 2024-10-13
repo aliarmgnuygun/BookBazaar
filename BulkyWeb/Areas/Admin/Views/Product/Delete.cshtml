@@ -18,7 +18,7 @@
                     <label asp-for="Title" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-2 col-12">
-                    <textarea asp-for="Description" class="form-control border-0 shadow"></textarea>
+                    <textarea asp-for="Description" disabled class="form-control border-0 shadow"></textarea>
                     <label asp-for="Description" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-2 col-12">
@@ -28,6 +28,10 @@
                 <div class="form-floating py-2 col-12">
                     <input asp-for="ISBN" disabled class="form-control border-0 shadow" />
                     <label asp-for="ISBN" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="ImageUrl" disabled class="form-control border-0 shadow" />
+                    <label asp-for="ImageUrl" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-2 col-12">
                     <input asp-for="ListPrice" disabled class="form-control border-0 shadow" />
