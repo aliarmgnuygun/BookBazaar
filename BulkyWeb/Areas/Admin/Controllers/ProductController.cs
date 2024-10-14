@@ -1,12 +1,15 @@
 ﻿using BookBazaar.DataAccess.Repository.IRepository;
 using BookBazaar.Models;
 using BookBazaar.Models.ViewModels;
+using BookBazaar.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookBazaar.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
         public readonly IUnitOfWork _unitOfWork;

@@ -1,10 +1,13 @@
 ﻿using BookBazaar.DataAccess.Repository.IRepository;
 using BookBazaar.Models;
+using BookBazaar.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookBazaar.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
