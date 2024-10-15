@@ -3,8 +3,9 @@
     public interface IUnitOfWork
     {
         ICategoryRepository Category { get; }
-        IProductRepository Product { get; }
         ICompanyRepository Company { get; }
+        IProductRepository Product { get; }
+        IShoppingCardRepository ShoppingCart { get; }
         void Save();
     }
 }
