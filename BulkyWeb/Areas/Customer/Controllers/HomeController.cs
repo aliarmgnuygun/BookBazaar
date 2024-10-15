@@ -25,8 +25,12 @@ namespace BookBazaar.Areas.Customer.Controllers
         }
         public IActionResult Details(int productId)
         {
-            Product product = _unitOfWork.Product.Get(p=> p.Id == productId,includeProperties: "Category");
-            return View(product);
+            ShoppingCart cart = new()
+            {
+                Product = _unitOfWork.Product.Get(p => p.Id == productId, includeProperties: "Category"),
+                ProductId = productId
+            };
+            return View(cart);
         }
 
         public IActionResult Privacy()
