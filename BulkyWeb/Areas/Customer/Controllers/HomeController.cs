@@ -52,10 +52,12 @@ namespace BookBazaar.Areas.Customer.Controllers
                 // card exists in db for that user so we will just update the count
                 cardFromDb.Count += shoppingCart.Count;
                 _unitOfWork.ShoppingCart.Update(cardFromDb);
+                TempData["success"] = "Shopping cart updated successfully";
             }
             else
             {
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
+                TempData["success"] = "Book added to cart successfully";
             }
 
             _unitOfWork.Save();
