@@ -47,9 +47,14 @@ namespace BookBazaar.DataAccess.Repository
 
         //Category is a navigation property in Product, so we need to include it
         //Category, CoverType, Company etc. may be navigation properties in Product
-        public IEnumerable<T> GetAll(string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProperty in includeProperties
