@@ -1,7 +1,6 @@
 ﻿using BookBazaar.DataAccess.Data;
 using BookBazaar.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 
 namespace BookBazaar.DataAccess.Repository
@@ -19,10 +18,10 @@ namespace BookBazaar.DataAccess.Repository
 
         public void Add(T entity)
         {
-            dbSet.Add(entity);    
+            dbSet.Add(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> filter,string? includeProperties = null)
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
             query = query.Where(filter);
@@ -36,7 +35,7 @@ namespace BookBazaar.DataAccess.Repository
             }
             return query.FirstOrDefault();
         }
-        
+
         //Category is a navigation property in Product, so we need to include it
         //Category, CoverType, Company etc. may be navigation properties in Product
         public IEnumerable<T> GetAll(string? includeProperties = null)

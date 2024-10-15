@@ -13,12 +13,18 @@ namespace BookBazaar.DataAccess.Data
 
         // Add DbSet properties
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Company>().HasData(
+                new Company { Id = 1, Name = "Vivid Books", StreetAddress = "123 Main St", City = "New York", State = "NY", PostalCode = "10000" },
+                new Company { Id = 2, Name = "Bookworm", StreetAddress = "456 Elm St", City = "New York", State = "NY", PostalCode = "10000" }
+                );
 
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Action", DisplayOrder = 1 },
