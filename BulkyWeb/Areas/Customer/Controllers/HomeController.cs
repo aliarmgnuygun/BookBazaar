@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Diagnostics;
+using System.Security.Claims;
 using BookBazaar.DataAccess.Repository.IRepository;
 using BookBazaar.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookBazaar.Areas.Customer.Controllers
@@ -28,9 +30,36 @@ namespace BookBazaar.Areas.Customer.Controllers
             ShoppingCart cart = new()
             {
                 Product = _unitOfWork.Product.Get(p => p.Id == productId, includeProperties: "Category"),
+                Count = 1,
                 ProductId = productId
             };
             return View(cart);
+        }
+        
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            shoppingCart.ApplicationUserId = userId;
+
+            ShoppingCart cardFromDb = _unitOfWork.ShoppingCart.Get(
+                u => u.ApplicationUserId == userId && u.ProductId == shoppingCart.ProductId);
+
+            if (cardFromDb != null)
+            {
+                // card exists in db for that user so we will just update the count
+                cardFromDb.Count += shoppingCart.Count;
+                _unitOfWork.ShoppingCart.Update(cardFromDb);
+            }
+            else
+            {
+                _unitOfWork.ShoppingCart.Add(shoppingCart);
+            }
+
+            _unitOfWork.Save();
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Privacy()
