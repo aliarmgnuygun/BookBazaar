@@ -121,7 +121,8 @@ namespace BookBazaar.Areas.Customer.Controllers
             if (applicationUser.CompanyId.GetValueOrDefault() == 0)
             {
                 //it is a regular customer account and we need to capture payment
-                //stripe logic
+                //adyen logic
+                //var options = new AdyenPaymentOptions()
 
             }
 
