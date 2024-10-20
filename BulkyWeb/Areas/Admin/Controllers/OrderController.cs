@@ -2,7 +2,6 @@
 using BookBazaar.Models;
 using BookBazaar.Utility;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookBazaar.Areas.Admin.Controllers
