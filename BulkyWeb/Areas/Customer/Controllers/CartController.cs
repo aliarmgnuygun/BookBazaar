@@ -30,7 +30,7 @@ namespace BookBazaar.Areas.Customer.Controllers
             ShoppingCartVM ShoppingCartVM = new()
             {
                 ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.ApplicationUserId == userId, includeProperties: "Product"),
-                OrderHeader = new ()
+                OrderHeader = new()
             };
 
             foreach (var cart in ShoppingCartVM.ShoppingCartList)
@@ -44,12 +44,13 @@ namespace BookBazaar.Areas.Customer.Controllers
 
         public IActionResult Summary()
         {
-            var claimsIdentiy = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentiy.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            ShoppingCartVM ShoppingCartVM = new()
+            ShoppingCartVM = new()
             {
-                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.ApplicationUserId == userId, includeProperties: "Product"),
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
+                includeProperties: "Product"),
                 OrderHeader = new()
             };
 
@@ -69,7 +70,7 @@ namespace BookBazaar.Areas.Customer.Controllers
             }
             return View(ShoppingCartVM);
         }
-        
+
         [HttpPost]
         [ActionName("Summary")]
         public IActionResult SummaryPOST()
@@ -82,7 +83,7 @@ namespace BookBazaar.Areas.Customer.Controllers
 
             ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
             ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
-            
+
             ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
 
             foreach (var cart in ShoppingCartVM.ShoppingCartList)
@@ -93,7 +94,7 @@ namespace BookBazaar.Areas.Customer.Controllers
 
             if (applicationUser.CompanyId.GetValueOrDefault() == 0)
             {
-                //it is a regular customer
+                //it is a regular customer 
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
             }
@@ -115,7 +116,6 @@ namespace BookBazaar.Areas.Customer.Controllers
                     Price = cart.Price,
                     Count = cart.Count
                 };
-
                 _unitOfWork.OrderDetail.Add(orderDetail);
                 _unitOfWork.Save();
             }
@@ -156,7 +156,7 @@ namespace BookBazaar.Areas.Customer.Controllers
                 return new StatusCodeResult(303);
             }
 
-            return RedirectToAction(nameof(OrderConfirmation), new {id= ShoppingCartVM.OrderHeader.Id});
+            return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
         }
 
         public IActionResult OrderConfirmation(int id)
@@ -165,8 +165,10 @@ namespace BookBazaar.Areas.Customer.Controllers
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
                 //this is an order by customer
+
                 var service = new SessionService();
                 Session session = service.Get(orderHeader.SessionId);
+
                 if (session.PaymentStatus.ToLower() == "paid")
                 {
                     _unitOfWork.OrderHeader.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
@@ -174,10 +176,12 @@ namespace BookBazaar.Areas.Customer.Controllers
                     _unitOfWork.Save();
                 }
             }
+            
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
-                .GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+               .GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
             _unitOfWork.Save();
+           
             return View(id);
         }
 
@@ -211,7 +215,7 @@ namespace BookBazaar.Areas.Customer.Controllers
 
         public IActionResult Minus(int cartId)
         {
-            var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId);           
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId);
 
             if (cartFromDb.Count <= 1)
             {
@@ -222,12 +226,12 @@ namespace BookBazaar.Areas.Customer.Controllers
                 cartFromDb.Count -= 1;
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
             }
-            
+
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Remove(int cartId) 
+        public IActionResult Remove(int cartId)
         {
             var cartFromDb = _unitOfWork.ShoppingCart.Get(c => c.Id == cartId);
             _unitOfWork.ShoppingCart.Remove(cartFromDb);
