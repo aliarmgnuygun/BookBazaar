@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Diagnostics;
-using System.Security.Claims;
 using BookBazaar.DataAccess.Repository.IRepository;
 using BookBazaar.Models;
+using BookBazaar.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BookBazaar.Areas.Customer.Controllers
 {
@@ -22,6 +22,15 @@ namespace BookBazaar.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            if(claim != null)
+            {
+                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.
+                    GetAll(u => u.ApplicationUserId == claim.Value).Count());
+            }
+
             IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category");
             return View(productList);
         }
@@ -35,7 +44,7 @@ namespace BookBazaar.Areas.Customer.Controllers
             };
             return View(cart);
         }
-        
+
         [HttpPost]
         [Authorize]
         public IActionResult Details(ShoppingCart shoppingCart)
@@ -52,15 +61,19 @@ namespace BookBazaar.Areas.Customer.Controllers
                 // card exists in db for that user so we will just update the count
                 cardFromDb.Count += shoppingCart.Count;
                 _unitOfWork.ShoppingCart.Update(cardFromDb);
+                _unitOfWork.Save();
                 TempData["success"] = "Shopping cart updated successfully";
             }
             else
             {
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
+                _unitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.
+                    GetAll(u => u.ApplicationUserId == userId).Count());
                 TempData["success"] = "Book added to cart successfully";
             }
 
-            _unitOfWork.Save();
+            
             return RedirectToAction(nameof(Index));
         }
 
