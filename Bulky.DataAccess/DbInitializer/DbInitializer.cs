@@ -8,20 +8,24 @@ namespace BookBazaar.DataAccess.DbInitializer
 {
     public class DbInitializer : IDbInitializer
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _db;
 
-        public DbInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext db)
+        public DbInitializer(
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext db)
         {
-            _userManager = userManager;
             _roleManager = roleManager;
+            _userManager = userManager;
             _db = db;
         }
 
+
         public void Initialize()
         {
-            // migrations if they are not applied
+            //migrations if they are not applied
             try
             {
                 if (_db.Database.GetPendingMigrations().Count() > 0)
@@ -31,14 +35,13 @@ namespace BookBazaar.DataAccess.DbInitializer
             }
             catch (Exception ex) { }
 
-
-            // create roles if they are not created
+            //create roles if they are not created
             if (!_roleManager.RoleExistsAsync(SD.Role_Customer).GetAwaiter().GetResult())
             {
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
+                _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
+                _roleManager.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
 
                 // create admin user if it does not exist  
                 _userManager.CreateAsync(new ApplicationUser

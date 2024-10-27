@@ -15,16 +15,19 @@ namespace BookBazaar.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IEmailSender _emailSender;
+        //private readonly IEmailSender _emailSender;
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
-        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender)
+        //public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender)
+        //{
+        //    _unitOfWork = unitOfWork;
+        //    _emailSender = emailSender;
+        //}
+        public CartController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-            _emailSender = emailSender;
+            _unitOfWork = unitOfWork; 
         }
-
         public IActionResult Index()
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
@@ -180,10 +183,12 @@ namespace BookBazaar.Areas.Customer.Controllers
                     HttpContext.Session.Clear();
                 }
             }
-
+            
+            /*
             _emailSender.SendEmailAsync
                 (orderHeader.ApplicationUser.Email, "Book Bazaar - Order Created " +
                 $"<p>New Order Created - {orderHeader.Id}</p>");
+            */
 
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart
                .GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
