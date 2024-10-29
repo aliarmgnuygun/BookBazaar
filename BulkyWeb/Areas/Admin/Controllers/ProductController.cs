@@ -69,7 +69,7 @@ namespace BookBazaar.Areas.Admin.Controllers
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath + @"\images\product", fileName);
-
+                    /*
                     if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
                     {
                         //delete old image
@@ -86,6 +86,7 @@ namespace BookBazaar.Areas.Admin.Controllers
                     }
 
                     productVM.Product.ImageUrl = @"\images\product\" + fileName;
+                    */
                 }
 
                 if (productVM.Product.Id == 0)
@@ -132,11 +133,11 @@ namespace BookBazaar.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Error while deleting" });
             }
 
-            var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
-            if (System.IO.File.Exists(oldFilePath))
-            {
-                System.IO.File.Delete(oldFilePath);
-            }
+            //var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
+            //if (System.IO.File.Exists(oldFilePath))
+            //{
+            //    System.IO.File.Delete(oldFilePath);
+            //}
 
             _unitOfWork.Product.Remove(productToBeDeleted);
             _unitOfWork.Save();

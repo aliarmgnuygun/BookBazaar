@@ -16,10 +16,10 @@ namespace BookBazaar.DataAccess.Repository
         {
             var objFromDb = _db.Products.FirstOrDefault(p=> p.Id == obj.Id);
             if (objFromDb != null) {
-                if (obj.ImageUrl != null)
-                {
-                    objFromDb.ImageUrl = obj.ImageUrl;
-                }
+                //if (obj.ImageUrl != null)
+                //{
+                //    objFromDb.ImageUrl = obj.ImageUrl;
+                //}
                 objFromDb.Title = obj.Title;
                 objFromDb.Author = obj.Author;
                 objFromDb.ISBN = obj.ISBN;
