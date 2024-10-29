@@ -7,6 +7,7 @@ namespace BookBazaar.Utility
 {
     public class EmailSender : IEmailSender
     {
+        /*
         public string SendGridSecret { get; set; }
         public EmailSender(IConfiguration configuration)
         {
@@ -22,6 +23,11 @@ namespace BookBazaar.Utility
             var message = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
 
             return client.SendEmailAsync(message);
+        }
+        */
+        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+           return Task.CompletedTask;
         }
     }
 }
