@@ -22,7 +22,7 @@ namespace BookBazaar.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            List<Product> productList = _unitOfWork.Product.GetAll(includeProperties:"Category").ToList();
+            List<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
             return View(productList);
         }
 
@@ -54,53 +54,55 @@ namespace BookBazaar.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
+        public IActionResult Upsert(ProductVM productVM, List<IFormFile> files)
         {
             if (productVM.Product.Title == productVM.Product.Author)
             {
                 ModelState.AddModelError("Title", "Book Title and Author Name cannot be the same");
             }
 
+            if (productVM.Product.Id == 0)
+            {
+                _unitOfWork.Product.Add(productVM.Product);
+                TempData["Success"] = "Product created successfully";
+            }
+            else
+            {
+                _unitOfWork.Product.Update(productVM.Product);
+                TempData["Success"] = "Product updated successfully";
+            }
+
+            _unitOfWork.Save();
+
             if (ModelState.IsValid)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
 
-                if (file != null)
+                if (files != null)
                 {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath + @"\images\product", fileName);
-                    /*
-                    if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    foreach (IFormFile file in files)
                     {
-                        //delete old image
-                        var oldFilePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
-                        if (System.IO.File.Exists(oldFilePath))
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        string productPath = @"images\products\product-" + productVM.Product.Id;
+                        string finalPath = Path.Combine(wwwRootPath, productPath);
+                        if (!Directory.Exists(finalPath))
+                            Directory.CreateDirectory(finalPath);
+                        using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
                         {
-                            System.IO.File.Delete(oldFilePath);
+                            file.CopyTo(fileStream);
                         }
+                        ProductImage productImage = new()
+                        {
+                            ImageUrl = @"\" + productPath + @"\" + fileName,
+                            ProductId = productVM.Product.Id,
+                        };
+                        if (productVM.Product.ProductImages == null)
+                            productVM.Product.ProductImages = new List<ProductImage>();
+                        productVM.Product.ProductImages.Add(productImage);
                     }
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    productVM.Product.ImageUrl = @"\images\product\" + fileName;
-                    */
-                }
-
-                if (productVM.Product.Id == 0)
-                {
-                    _unitOfWork.Product.Add(productVM.Product);
-                    TempData["Success"] = "Book created successfully";
-                }
-                else
-                {
                     _unitOfWork.Product.Update(productVM.Product);
-                    TempData["Success"] = "Book updated successfully";
+                    _unitOfWork.Save();
                 }
-
-                _unitOfWork.Save();
                 return RedirectToAction("Index");
             }
             else
