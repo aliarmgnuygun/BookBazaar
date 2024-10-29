@@ -10,6 +10,13 @@ using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var facebookAppId = builder.Configuration["Authentication:Facebook:AppId"];
+var facebookAppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+var microsoftClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+var microsoftClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -23,21 +30,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = $"/Identity/Account/Logout";
     options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
-builder.Services.AddAuthentication().AddGoogle(options =>
-{
-    options.ClientId = "880548272023-vcf8aoiq327qme5pfpapbv5533eum6l7.apps.googleusercontent.com";
-    options.ClientSecret = "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";
-});
-builder.Services.AddAuthentication().AddFacebook(options =>
-{
-    options.AppId = "1553100872012715";
-    options.AppSecret = "e65161c254858579619b9a413eaa3fc9";
-});
-builder.Services.AddAuthentication().AddMicrosoftAccount(options =>
-{
-    options.ClientId = "38732f0f-0ad3-475b-90fc-19ff60ea6cfb";
-    options.ClientSecret = "yGs8Q~BLFpSYanyDVpNaDeqffbhYpnOH.wqReaLd";
-});
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = facebookAppId;
+        options.AppSecret = facebookAppSecret;
+    })
+    .AddMicrosoftAccount(options =>
+    {
+        options.ClientId = microsoftClientId;
+        options.ClientSecret = microsoftClientSecret;
+    });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
