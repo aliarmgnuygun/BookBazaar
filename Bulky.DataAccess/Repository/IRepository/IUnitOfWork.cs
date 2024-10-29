@@ -6,6 +6,7 @@
         ICategoryRepository Category { get; }
         ICompanyRepository Company { get; }
         IProductRepository Product { get; }
+        IProductImageRepository ProductImage { get; }
         IShoppingCartRepository ShoppingCart { get; }
         IOrderHeaderRepository OrderHeader { get; }
         IOrderDetailRepository OrderDetail { get; }

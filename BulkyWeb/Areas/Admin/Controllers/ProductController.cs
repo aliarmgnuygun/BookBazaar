@@ -118,6 +118,29 @@ namespace BookBazaar.Areas.Admin.Controllers
             }
         }
 
+        public IActionResult DeleteImage(int imageId)
+        {
+            var imageToBeDeleted = _unitOfWork.ProductImage.Get(p => p.Id == imageId);
+            var productId = imageToBeDeleted.ProductId;
+
+            if(imageToBeDeleted != null)
+            {
+                if (!string.IsNullOrEmpty(imageToBeDeleted.ImageUrl))
+                {
+                    var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, imageToBeDeleted.ImageUrl.TrimStart('\\'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                }
+
+                _unitOfWork.ProductImage.Remove(imageToBeDeleted);
+                _unitOfWork.Save();
+                TempData["Success"] = "Image deleted successfully";
+            }
+            return RedirectToAction(nameof(Upsert), new { id = productId });
+        }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
@@ -134,12 +157,6 @@ namespace BookBazaar.Areas.Admin.Controllers
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
-
-            //var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
-            //if (System.IO.File.Exists(oldFilePath))
-            //{
-            //    System.IO.File.Delete(oldFilePath);
-            //}
 
             _unitOfWork.Product.Remove(productToBeDeleted);
             _unitOfWork.Save();

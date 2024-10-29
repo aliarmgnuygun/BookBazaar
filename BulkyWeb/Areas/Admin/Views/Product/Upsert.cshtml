@@ -89,6 +89,9 @@
                         {
                             <div class="border p-1 m-2 text-center">
                                 <img src="@image.ImageUrl" style="border-radius:5px; border: 1px solid #bbb9b9; width:100%;" alt="Book Image" />
+                                <a asp-action="DeleteImage" class="btn btn-danger" asp-route-imageId="@image.Id">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </a>
                             </div>
                         }
                     }
@@ -102,13 +105,13 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         tinymce.init({
-              selector: 'textarea',
-              plugins: [
-                    // Core editing features
-                    'anchor', 'autolink', 'charmap', 'lists', 'visualblocks', 'wordcount',
-                    'checklist', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'mentions', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
-              ],
-              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent'
+                selector: 'textarea',
+                plugins: [
+                        // Core editing features
+                        'anchor', 'autolink', 'charmap', 'lists', 'visualblocks', 'wordcount',
+                        'checklist', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'mentions', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
+                ],
+                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent'
         });
     </script>
 }
